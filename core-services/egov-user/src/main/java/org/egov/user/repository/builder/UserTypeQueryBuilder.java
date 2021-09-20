@@ -194,8 +194,10 @@ public class UserTypeQueryBuilder {
             // preparedStatementValues.add("'%"+userSearchCriteria.getName().trim()+"%'"); 	
             
             
-            selectQuery.append(" u.name like" + " '%?%'");
-            preparedStatementValues.add(userSearchCriteria.getName().trim());
+           // selectQuery.append(" u.name like" + " '%?%'");
+           // preparedStatementValues.add(userSearchCriteria.getName().trim());
+            
+            selectQuery.append(" u.name like '%").append(userSearchCriteria.getName().trim()).append("%'");
         
         }
 
