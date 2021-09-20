@@ -124,6 +124,7 @@ public class UserTypeQueryBuilder {
             return;
 
         selectQuery.append(" WHERE");
+        userSearchCriteria.setFuzzyLogic(Boolean.TRUE);
         boolean isAppendAndClause = false;
 
         if (userSearchCriteria.getId() != null && !userSearchCriteria.getId().isEmpty()) {
@@ -146,8 +147,8 @@ public class UserTypeQueryBuilder {
 
         if (!userSearchCriteria.isFuzzyLogic() && userSearchCriteria.getName() != null) {
             isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);
-            selectQuery.append(" u.name like ?");
-            preparedStatementValues.add("%"+userSearchCriteria.getName().trim()+"%");
+            selectQuery.append(" u.name = ?");
+            preparedStatementValues.add(userSearchCriteria.getName().trim());
         }
 
         if (userSearchCriteria.getActive() != null) {
@@ -188,7 +189,10 @@ public class UserTypeQueryBuilder {
 
         if (userSearchCriteria.isFuzzyLogic() && userSearchCriteria.getName() != null) {
             isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);
-            selectQuery.append(" u.name like " + "'%").append(userSearchCriteria.getName().trim()).append("%'");
+            //selectQuery.append(" u.name like " + "'%").append(userSearchCriteria.getName().trim()).append("%'");
+            selectQuery.append(" u.name = like ?");
+            preparedStatementValues.add("'%"+userSearchCriteria.getName().trim()+"%'");
+        
         }
 
         if (!isEmpty(userSearchCriteria.getUuid())) {
