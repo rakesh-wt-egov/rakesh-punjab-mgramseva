@@ -190,8 +190,13 @@ public class UserTypeQueryBuilder {
         if (userSearchCriteria.isFuzzyLogic() && userSearchCriteria.getName() != null) {
             isAppendAndClause = addAndClauseIfRequired(isAppendAndClause, selectQuery);
             //selectQuery.append(" u.name like " + "'%").append(userSearchCriteria.getName().trim()).append("%'");
-            selectQuery.append(" u.name like ?");
-            preparedStatementValues.add("'%"+userSearchCriteria.getName().trim()+"%'");
+            //  selectQuery.append(" u.name like ?");
+            // preparedStatementValues.add("'%"+userSearchCriteria.getName().trim()+"%'"); 	
+            
+            
+            selectQuery.append(" u.name like" + " '%?");
+            preparedStatementValues.add(userSearchCriteria.getName().trim());
+            selectQuery.append("%'");
         
         }
 
