@@ -1,5 +1,7 @@
 package org.egov.waterconnection.service;
 
+import static org.egov.waterconnection.constants.WCConstants.APPROVE_CONNECTION;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,8 +50,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.egov.waterconnection.constants.WCConstants.APPROVE_CONNECTION;
 
 @Component
 public class WaterServiceImpl implements WaterService {

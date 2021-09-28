@@ -3,7 +3,6 @@ package org.egov.waterconnection.service;
 import java.util.List;
 
 import org.egov.common.contract.request.RequestInfo;
-import org.egov.waterconnection.web.models.Feedback;
 import org.egov.waterconnection.web.models.FeedbackRequest;
 import org.egov.waterconnection.web.models.FeedbackSearchCriteria;
 import org.egov.waterconnection.web.models.SearchCriteria;

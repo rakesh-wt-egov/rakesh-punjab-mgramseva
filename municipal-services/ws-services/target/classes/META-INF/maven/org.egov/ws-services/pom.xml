@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.egov</groupId>
@@ -89,7 +90,6 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.2.jre7</version>
 		</dependency>
 		<dependency>
 			<groupId>org.egov</groupId>
@@ -105,6 +105,22 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.0.0</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.googlecode.json-simple</groupId>
+		    <artifactId>json-simple</artifactId>
+		    <version>1.1.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
@@ -151,41 +167,59 @@
 				</configuration>
 			</plugin>
 			<plugin>
-		        <groupId>cz.habarta.typescript-generator</groupId>
-		        <artifactId>typescript-generator-maven-plugin</artifactId>
-		        <version>2.22.595</version>
-		        <executions>
-		          <execution>
-		            <id>generate</id>
-		            <goals>
-		              <goal>generate</goal>
-		            </goals>
-		            <phase>process-classes</phase>
-		          </execution>
-		        </executions>
-		        <configuration>
-		          <jsonLibrary>jackson2</jsonLibrary>
-		          <classes>
-			          <class>org.egov.waterconnection.web.models.Connection</class>
-			          <class>org.egov.waterconnection.web.models.WaterConnection</class>
-			          <class>org.egov.waterconnection.web.models.Document</class>
-			          <class>org.egov.waterconnection.web.models.PlumberInfo</class>
-			          <class>org.egov.waterconnection.web.models.RequestInfoWrapper</class>
-			          <class>org.egov.waterconnection.web.models.WaterConnectionRequest</class>
-			          <class>org.egov.waterconnection.web.models.WaterConnectionResponse</class>
-		          </classes>
-		          <customTypeMappings>
+				<groupId>cz.habarta.typescript-generator</groupId>
+				<artifactId>typescript-generator-maven-plugin</artifactId>
+				<version>2.22.595</version>
+				<executions>
+					<execution>
+						<id>generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<phase>process-classes</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<jsonLibrary>jackson2</jsonLibrary>
+					<classes>
+						<class>org.egov.waterconnection.web.models.Connection</class>
+						<class>org.egov.waterconnection.web.models.WaterConnection</class>
+						<class>org.egov.waterconnection.web.models.Document</class>
+						<class>org.egov.waterconnection.web.models.PlumberInfo</class>
+						<class>org.egov.waterconnection.web.models.RequestInfoWrapper</class>
+						<class>org.egov.waterconnection.web.models.WaterConnectionRequest</class>
+						<class>org.egov.waterconnection.web.models.WaterConnectionResponse</class>
+					</classes>
+					<customTypeMappings>
 						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
 						<customTypeMapping>org.egov.waterconnection.web.models.users.User:User</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.request.User:User</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.request.RequestInfo:RequestInfo</customTypeMapping>
 						<customTypeMapping>org.egov.common.contract.response.ResponseInfo:ResponseInfo</customTypeMapping>
 					</customTypeMappings>
-		          <namespace>Digit</namespace>
-		          <debug>true</debug>
-		          <outputKind>module</outputKind>
-	          	</configuration>
-          </plugin>
+					<namespace>Digit</namespace>
+					<debug>true</debug>
+					<outputKind>module</outputKind>
+				</configuration>
+			</plugin>
+			<plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 </project>
