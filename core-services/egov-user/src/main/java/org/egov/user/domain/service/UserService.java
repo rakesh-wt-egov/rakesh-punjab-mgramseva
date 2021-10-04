@@ -225,7 +225,7 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(User user, RequestInfo requestInfo,String onBoarding) {
+    public User createUser(User user, RequestInfo requestInfo) {
         
         user.setUuid(UUID.randomUUID().toString());
         user.validateNewUser(createUserValidateName);
@@ -251,8 +251,7 @@ public class UserService {
         user.setDefaultPasswordExpiry(defaultPasswordExpiryInDays);
         user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
         User persistedNewUser = persistNewUser(user);
-        if(onBoarding!=null && onBoarding.equals("true"))
-        	sendOnBoardingSMS(user, requestInfo);
+       
         return encryptionDecryptionUtil.decryptObject(persistedNewUser, "User", User.class, requestInfo);
  
         /* decrypt here  because encrypted data coming from DB*/
@@ -274,7 +273,7 @@ public class UserService {
             return tenantId;
     }
     
-    private void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
+    public void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(user.getTenantId(), requestInfo);
 		String message = notificationUtil.getMessageTemplate(UserServiceConstants.ON_BOARD_EMPLOYEE, localizationMessage);
@@ -308,7 +307,7 @@ public class UserService {
      */
     public User createCitizen(User user, RequestInfo requestInfo) {
         validateAndEnrichCitizen(user);
-        return createUser(user, requestInfo,null);
+        return createUser(user, requestInfo);
     }
 
 
