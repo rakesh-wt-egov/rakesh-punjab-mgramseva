@@ -9,6 +9,7 @@ import org.egov.common.contract.request.RequestInfo;
 import org.egov.user.persistence.repository.ServiceRequestRepository;
 import org.egov.user.producer.UserSMSProducer;
 import org.egov.user.web.contract.SMSRequest;
+import org.egov.user.web.contract.ShortenRequest;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -149,15 +150,15 @@ public class NotificationUtil {
 	 
 	public String getShortnerURL( ) {
 		String	actualURL=notificationUrl+webUiPath;
-		JSONObject obj = new JSONObject();
-		obj.put(URL, actualURL);
+		ShortenRequest request=new ShortenRequest();
+		request.setUrl(actualURL);
 		String url = notificationUrl + shortenerURL;
 		
-		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), obj);
+		Object response = serviceRequestRepository.getShorteningURL(new StringBuilder(url), request);
 		return response.toString();
 	}
 	 
-	
+	   
 	 
 
 }

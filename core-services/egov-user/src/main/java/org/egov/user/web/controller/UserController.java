@@ -101,9 +101,10 @@ public class UserController {
         User user = createUserRequest.toDomain(true);
         user.setMobileValidationMandatory(isMobileValidationRequired(headers));
         user.setOtpValidationMandatory(false);
+        String password=user.getPassword();
         final User newUser = userService.createUser(user, createUserRequest.getRequestInfo());
         if(onBoarding!=null && onBoarding.equals("true"))
-        	userService.sendOnBoardingSMS(newUser, createUserRequest.getRequestInfo());
+        	userService.sendOnBoardingSMS(newUser,password, createUserRequest.getRequestInfo());
         
         return createResponse(newUser);
     }

@@ -273,7 +273,7 @@ public class UserService {
             return tenantId;
     }
     
-    public void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
+    public void sendOnBoardingSMS(User user, String password, RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(user.getTenantId(), requestInfo);
 		log.info("localizationMessage" + localizationMessage);
@@ -283,7 +283,7 @@ public class UserService {
 		message = message.replace("{USER}", user.getName());
 		message = message.replace("{LINK}", notificationUtil.getShortnerURL());
 		message = message.replace(" {PHNO}", user.getMobileNumber());
-		message = message.replace("{PASSWORD}", user.getPassword());
+		message = message.replace("{PASSWORD}", password);
 		
 		if (message == null) {
 			log.info("No message template found for, {} " + UserServiceConstants.ON_BOARD_EMPLOYEE);
