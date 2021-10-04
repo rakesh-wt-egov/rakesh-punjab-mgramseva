@@ -83,6 +83,7 @@ public class UserController {
             return new ResponseEntity<>(object, HttpStatus.OK);
         }
         User createdUser = userService.createCitizen(user, createUserRequest.getRequestInfo());
+        
         return createResponse(createdUser);
     }
 
@@ -95,12 +96,13 @@ public class UserController {
      */
     @PostMapping("/users/_createnovalidate")
     public UserDetailResponse createUserWithoutValidation(@RequestBody @Valid CreateUserRequest createUserRequest,
-                                                          @RequestHeader HttpHeaders headers) {
+                                                          @RequestHeader HttpHeaders headers,@RequestParam(required=false) String onBoarding  ) {
 
         User user = createUserRequest.toDomain(true);
         user.setMobileValidationMandatory(isMobileValidationRequired(headers));
         user.setOtpValidationMandatory(false);
-        final User newUser = userService.createUser(user, createUserRequest.getRequestInfo());
+        final User newUser = userService.createUser(user, createUserRequest.getRequestInfo(),onBoarding);
+        
         return createResponse(newUser);
     }
 

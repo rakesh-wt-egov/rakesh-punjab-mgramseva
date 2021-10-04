@@ -1,29 +1,51 @@
 package org.egov.user.domain.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.Objects.isNull;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.egov.user.config.UserServiceConstants.USER_CLIENT_ID;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
 import org.egov.common.contract.request.RequestInfo;
 import org.egov.tracer.model.CustomException;
-import org.egov.user.domain.exception.*;
+import org.egov.user.config.UserServiceConstants;
+import org.egov.user.domain.exception.AtleastOneRoleCodeException;
+import org.egov.user.domain.exception.DuplicateUserNameException;
+import org.egov.user.domain.exception.InvalidUpdatePasswordRequestException;
+import org.egov.user.domain.exception.OtpValidationPendingException;
+import org.egov.user.domain.exception.PasswordMismatchException;
+import org.egov.user.domain.exception.UserNameNotValidException;
+import org.egov.user.domain.exception.UserNotFoundException;
+import org.egov.user.domain.exception.UserProfileUpdateDeniedException;
 import org.egov.user.domain.model.LoggedInUserUpdatePasswordRequest;
 import org.egov.user.domain.model.NonLoggedInUserUpdatePasswordRequest;
 import org.egov.user.domain.model.User;
 import org.egov.user.domain.model.UserSearchCriteria;
 import org.egov.user.domain.model.enums.UserType;
 import org.egov.user.domain.service.utils.EncryptionDecryptionUtil;
+import org.egov.user.domain.service.utils.NotificationUtil;
 import org.egov.user.persistence.dto.FailedLoginAttempt;
 import org.egov.user.persistence.repository.FileStoreRepository;
 import org.egov.user.persistence.repository.OtpRepository;
 import org.egov.user.persistence.repository.UserRepository;
+import org.egov.user.web.contract.Category;
 import org.egov.user.web.contract.Otp;
 import org.egov.user.web.contract.OtpValidateRequest;
+import org.egov.user.web.contract.SMSRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -39,17 +61,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
-import static org.egov.user.config.UserServiceConstants.USER_CLIENT_ID;
-import static org.springframework.util.CollectionUtils.isEmpty;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 
 @Service
 @Slf4j
@@ -89,9 +102,19 @@ public class UserService {
 
     @Value("${egov.user.pwd.pattern.max.length}")
     private Integer pwdMaxLength;
+    
+	
+     
 
     @Autowired
     private RestTemplate restTemplate;
+    
+    @Autowired
+	private NotificationUtil notificationUtil;
+    
+    
+    
+    
 
     public UserService(UserRepository userRepository, OtpRepository otpRepository, FileStoreRepository fileRepository,
                        PasswordEncoder passwordEncoder, EncryptionDecryptionUtil encryptionDecryptionUtil, TokenStore tokenStore,
@@ -202,7 +225,7 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(User user, RequestInfo requestInfo) {
+    public User createUser(User user, RequestInfo requestInfo,String onBoarding) {
         
         user.setUuid(UUID.randomUUID().toString());
         user.validateNewUser(createUserValidateName);
@@ -228,10 +251,13 @@ public class UserService {
         user.setDefaultPasswordExpiry(defaultPasswordExpiryInDays);
         user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
         User persistedNewUser = persistNewUser(user);
+        if(onBoarding!=null && onBoarding.equals("true"))
+        sendOnBoardingSMS(user, requestInfo);
         return encryptionDecryptionUtil.decryptObject(persistedNewUser, "User", User.class, requestInfo);
-
+ 
         /* decrypt here  because encrypted data coming from DB*/
 
+        
     }
 
     private void validateUserUniqueness(User user) {
@@ -247,6 +273,32 @@ public class UserService {
         else
             return tenantId;
     }
+    
+    private void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
+		String localizationMessage = notificationUtil
+				.getLocalizationMessages(user.getTenantId(), requestInfo);
+		String message = notificationUtil.getMessageTemplate(UserServiceConstants.ON_BOARD_EMPLOYEE, localizationMessage);
+		
+		message = message.replace("{USER}", user.getName());
+		message = message.replace("{LINK}", notificationUtil.getShortnerURL());
+		message = message.replace(" {PHNO}", user.getMobileNumber());
+		message = message.replace("{PASSWORD}", user.getPassword());
+		
+		if (message == null) {
+			log.info("No message template found for, {} " + UserServiceConstants.ON_BOARD_EMPLOYEE);
+			return;
+		}else {
+			log.debug(message);
+		}
+		List<SMSRequest> smsRequests = new ArrayList<>();
+		SMSRequest req = SMSRequest.builder().mobileNumber(user.getMobileNumber()).message(message).category(Category.TRANSACTION).build();
+		smsRequests.add(req);
+		if (!CollectionUtils.isEmpty(smsRequests)) {
+			notificationUtil.sendSMS(smsRequests);
+		}
+	}
+    
+	
 
     /**
      * api will create the citizen with otp
@@ -256,7 +308,7 @@ public class UserService {
      */
     public User createCitizen(User user, RequestInfo requestInfo) {
         validateAndEnrichCitizen(user);
-        return createUser(user, requestInfo);
+        return createUser(user, requestInfo,null);
     }
 
 
