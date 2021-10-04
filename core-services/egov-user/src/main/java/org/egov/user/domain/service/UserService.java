@@ -276,9 +276,10 @@ public class UserService {
     public void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(user.getTenantId(), requestInfo);
+		log.info("localizationMessage" + localizationMessage);
 		String message = notificationUtil.getMessageTemplate(UserServiceConstants.ON_BOARD_EMPLOYEE, localizationMessage);
 	
-		log.info(message);
+		log.info("Message"+message);
 		message = message.replace("{USER}", user.getName());
 		message = message.replace("{LINK}", notificationUtil.getShortnerURL());
 		message = message.replace(" {PHNO}", user.getMobileNumber());
