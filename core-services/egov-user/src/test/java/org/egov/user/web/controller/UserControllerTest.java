@@ -238,7 +238,7 @@ public class UserControllerTest {
                 .build();
         final ArgumentCaptor<org.egov.user.domain.model.User> argumentCaptor =
                 ArgumentCaptor.forClass(org.egov.user.domain.model.User.class);
-        when(userService.createUser(argumentCaptor.capture(), any(),null)).thenReturn(expectedUser);
+        when(userService.createUser(argumentCaptor.capture(), any(),any())).thenReturn(expectedUser);
 
         mockMvc.perform(post("/users/_createnovalidate")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)

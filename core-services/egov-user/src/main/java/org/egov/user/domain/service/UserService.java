@@ -252,7 +252,7 @@ public class UserService {
         user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
         User persistedNewUser = persistNewUser(user);
         if(onBoarding!=null && onBoarding.equals("true"))
-        sendOnBoardingSMS(user, requestInfo);
+        	sendOnBoardingSMS(user, requestInfo);
         return encryptionDecryptionUtil.decryptObject(persistedNewUser, "User", User.class, requestInfo);
  
         /* decrypt here  because encrypted data coming from DB*/
