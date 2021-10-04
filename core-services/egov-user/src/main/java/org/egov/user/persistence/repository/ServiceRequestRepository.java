@@ -63,6 +63,7 @@ public class ServiceRequestRepository {
 				.append(System.lineSeparator());
 		str.append("URI: ").append(uri.toString()).append(System.lineSeparator());
 		try {
+			str.append("Request: ").append(mapper.writeValueAsString(request)).append(System.lineSeparator());
 			log.debug(str.toString());
 			response = restTemplate.postForObject(uri.toString(), request, String.class);
 		} catch (HttpClientErrorException e) {

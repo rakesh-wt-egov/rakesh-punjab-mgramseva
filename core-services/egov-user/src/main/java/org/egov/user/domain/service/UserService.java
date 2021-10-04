@@ -279,7 +279,7 @@ public class UserService {
 		log.info("localizationMessage" + localizationMessage);
 		String message = notificationUtil.getMessageTemplate(UserServiceConstants.ON_BOARD_EMPLOYEE, localizationMessage);
 	
-		log.info("Message"+message);
+		log.info("Message" + message);
 		message = message.replace("{USER}", user.getName());
 		message = message.replace("{LINK}", notificationUtil.getShortnerURL());
 		message = message.replace(" {PHNO}", user.getMobileNumber());
