@@ -1,14 +1,18 @@
 package org.egov.user.persistence.repository;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+
 import org.egov.tracer.model.ServiceCallException;
+import org.egov.user.web.contract.ShortenRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
@@ -56,15 +60,14 @@ public class ServiceRequestRepository {
 		return response;
 	}
 
-	public String getShorteningURL(StringBuilder uri, Object request) {
+	public String getShorteningURL(StringBuilder uri, ShortenRequest request) {
 		mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 		String response = null;
 		StringBuilder str = new StringBuilder(this.getClass().getCanonicalName()).append(".fetchResult:")
 				.append(System.lineSeparator());
 		str.append("URI: ").append(uri.toString()).append(System.lineSeparator());
 		try {
-			str.append("Request: ").append(mapper.writeValueAsString(request)).append(System.lineSeparator());
-			log.debug(str.toString());
+			log.info(str.toString());
 			response = restTemplate.postForObject(uri.toString(), request, String.class);
 		} catch (HttpClientErrorException e) {
 			log.error("External Service threw an Exception: ", e);
