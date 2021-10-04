@@ -108,7 +108,7 @@ public class UserServiceTest {
 
         when(encryptionDecryptionUtil.encryptObject(domainUser, "User", User.class)).thenReturn(domainUser);
         when(encryptionDecryptionUtil.decryptObject(expectedEntityUser, "User", User.class, getValidRequestInfo())).thenReturn(expectedEntityUser);
-        User returnedUser = userService.createUser(domainUser, getValidRequestInfo(),null);
+        User returnedUser = userService.createUser(domainUser, getValidRequestInfo());
 
         assertEquals(expectedEntityUser, returnedUser);
     }
@@ -223,7 +223,7 @@ public class UserServiceTest {
         domainUser.setOtpValidationMandatory(true);
         when(otpRepository.isOtpValidationComplete(getExpectedRequest())).thenReturn(false);
 
-        userService.createUser(domainUser, any(),null);
+        userService.createUser(domainUser, any());
     }
 
     @Test
@@ -231,7 +231,7 @@ public class UserServiceTest {
         org.egov.user.domain.model.User domainUser = validDomainUser(false);
         when(otpRepository.isOtpValidationComplete(getExpectedRequest())).thenReturn(false);
         when(encryptionDecryptionUtil.encryptObject(domainUser, "User", User.class)).thenReturn(domainUser);
-        userService.createUser(domainUser, getValidRequestInfo(),null);
+        userService.createUser(domainUser, getValidRequestInfo());
 
         verify(otpRepository, never()).isOtpValidationComplete(getExpectedRequest());
     }
@@ -240,7 +240,7 @@ public class UserServiceTest {
     public void test_should_raise_exception_when_user_is_invalid() throws Exception {
         org.egov.user.domain.model.User domainUser = org.egov.user.domain.model.User.builder().build();
 
-        userService.createUser(domainUser, getValidRequestInfo(),null);
+        userService.createUser(domainUser, getValidRequestInfo());
         verify(userRepository, never()).create(any(org.egov.user.domain.model.User.class));
     }
 

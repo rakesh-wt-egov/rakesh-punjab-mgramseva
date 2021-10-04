@@ -225,7 +225,7 @@ public class UserService {
      * @param user
      * @return
      */
-    public User createUser(User user, RequestInfo requestInfo,String onBoarding) {
+    public User createUser(User user, RequestInfo requestInfo) {
         
         user.setUuid(UUID.randomUUID().toString());
         user.validateNewUser(createUserValidateName);
@@ -251,8 +251,7 @@ public class UserService {
         user.setDefaultPasswordExpiry(defaultPasswordExpiryInDays);
         user.setTenantId(getStateLevelTenantForCitizen(user.getTenantId(), user.getType()));
         User persistedNewUser = persistNewUser(user);
-        if(onBoarding!=null && onBoarding.equals("true"))
-        	sendOnBoardingSMS(user, requestInfo);
+       
         return encryptionDecryptionUtil.decryptObject(persistedNewUser, "User", User.class, requestInfo);
  
         /* decrypt here  because encrypted data coming from DB*/
@@ -274,11 +273,12 @@ public class UserService {
             return tenantId;
     }
     
-    private void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
+    public void sendOnBoardingSMS(User user, RequestInfo requestInfo) {
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(user.getTenantId(), requestInfo);
 		String message = notificationUtil.getMessageTemplate(UserServiceConstants.ON_BOARD_EMPLOYEE, localizationMessage);
-		
+	
+		log.info(message);
 		message = message.replace("{USER}", user.getName());
 		message = message.replace("{LINK}", notificationUtil.getShortnerURL());
 		message = message.replace(" {PHNO}", user.getMobileNumber());
@@ -288,13 +288,14 @@ public class UserService {
 			log.info("No message template found for, {} " + UserServiceConstants.ON_BOARD_EMPLOYEE);
 			return;
 		}else {
-			log.debug(message);
+			log.info(message);
 		}
 		List<SMSRequest> smsRequests = new ArrayList<>();
 		SMSRequest req = SMSRequest.builder().mobileNumber(user.getMobileNumber()).message(message).category(Category.TRANSACTION).build();
 		smsRequests.add(req);
 		if (!CollectionUtils.isEmpty(smsRequests)) {
 			notificationUtil.sendSMS(smsRequests);
+			
 		}
 	}
     
@@ -308,7 +309,7 @@ public class UserService {
      */
     public User createCitizen(User user, RequestInfo requestInfo) {
         validateAndEnrichCitizen(user);
-        return createUser(user, requestInfo,null);
+        return createUser(user, requestInfo);
     }
 
 
