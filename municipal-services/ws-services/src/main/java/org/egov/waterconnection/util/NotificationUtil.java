@@ -101,6 +101,7 @@ public class NotificationUtil {
 			ArrayList<String> messageObj = (ArrayList<String>) JsonPath.parse(localizationMessage).read(path);
 			if(messageObj != null && messageObj.size() > 0) {
 				message = messageObj.get(0);
+				log.info("message from getMessageTemplate" + message);
 			}
 		} catch (Exception e) {
 			log.warn("Fetching from localization failed", e);

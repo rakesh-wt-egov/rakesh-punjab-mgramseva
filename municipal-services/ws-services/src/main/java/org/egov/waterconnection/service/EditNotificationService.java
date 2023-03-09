@@ -88,6 +88,7 @@ public class EditNotificationService {
 		Map<String, Object> additionalDetailsMap = new HashMap<String, Object>();
 		String localizationMessage = notificationUtil
 				.getLocalizationMessages(property.getTenantId(), waterConnectionRequest.getRequestInfo());
+		log.info("localizationMessage::",localizationMessage);
 		String code = WCConstants.WS_EDIT_IN_APP;
 		additionalDetailsMap.put("localizationCode", WCConstants.WS_EDIT_IN_APP);
 		if ((!waterConnectionRequest.getWaterConnection().getProcessInstance().getAction().equalsIgnoreCase(WCConstants.ACTIVATE_CONNECTION))
@@ -99,8 +100,10 @@ public class EditNotificationService {
 		if (message == null) {
 			log.info("No localized message found!!, Using default message");
 			message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_EDIT_APP_MSG, localizationMessage);
-			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_IN_APP))
+			if(code.equalsIgnoreCase(WCConstants.WS_MODIFY_IN_APP)) {
 				message = notificationUtil.getCustomizedMsg(DEFAULT_OBJECT_MODIFY_APP_MSG, localizationMessage);
+				log.info("message in app modify:"+message);
+			}
 		}
 		Map<String, String> mobileNumbersAndNames = new HashMap<>();
 		property.getOwners().forEach(owner -> {
@@ -115,6 +118,9 @@ public class EditNotificationService {
 				}
 			});
 		}
+		log.info("locatization message:" + localizationMessage);
+		log.info("message:" + message);
+		log.info("message:" , message);
 		Map<String, String> mobileNumberAndMessage = workflowNotificationService
 				.getMessageForMobileNumber(mobileNumbersAndNames, waterConnectionRequest, message, property, additionalDetailsMap);
 		Set<String> mobileNumbers = mobileNumberAndMessage.keySet().stream().collect(Collectors.toSet());
