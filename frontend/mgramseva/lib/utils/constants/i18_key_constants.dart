@@ -147,6 +147,7 @@ class Common {
 
   /// Payment complete
   String get DOWNLOAD => 'DOWNLOAD';
+  String get CORE_DOWNLOAD => 'CORE_DOWNLOAD';
 
   /// Payment complete
   String get SHARE_BILL => 'SHARE_BILL';
@@ -667,6 +668,9 @@ class _DashBoard {
   String get CORE_GPWSC_DETAILS_AND_RATE_INFO =>
       'CORE_GPWSC_DETAILS_AND_RATE_INFO';
   String get GPWSC_DETAILS => 'GPWSC_DETAILS';
+  String get CORE_REPORTS => 'CORE_REPORTS';
+  String get BILL_REPORT => 'BILL_REPORT';
+  String get COLLECTION_REPORT => 'COLLECTION_REPORT';
   String get GPWSC_RATE_INFO => 'GPWSC_RATE_INFO';
 }
 
